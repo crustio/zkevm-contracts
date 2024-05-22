@@ -25,6 +25,7 @@ import {
     PolygonZkEVMBridgeV2,
     PolygonValidium,
     PolygonValidiumEtrog,
+    Ethda,
 } from "../../typechain-types";
 
 async function main() {
@@ -299,6 +300,13 @@ async function main() {
             // // Setup data commitee to 0
             // await (await polygonDataCommittee?.setupCommittee(0, [], "0x")).wait();
             console.log(dataAvailabilityProtocol, "deployed to:", polygonDataCommittee?.target);
+
+            // Ethda set EthdaSequencerAddress
+            if (dataAvailabilityProtocol == "Ethda") {
+                const EthdaFactory = (await ethers.getContractFactory("Ethda", deployer)) as any;
+                let EthdaContract = (await EthdaFactory.attach(polygonDataCommittee?.target)) as Ethda;
+                await (await EthdaContract.setEthdaSequencerAddress(deployer.address)).wait();
+            }
         } else {
             await (await polygonDataCommittee?.transferOwnership(adminZkEVM)).wait();
         }
